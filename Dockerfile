@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+LABEL org.opencontainers.image.source=https://github.com/lobis/xmrig
+
 ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update && \
     apt-get install -y \
