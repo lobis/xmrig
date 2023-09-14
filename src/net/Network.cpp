@@ -163,13 +163,31 @@ void xmrig::Network::onConfigChanged(Config *config, Config *previousConfig)
 }
 
 
-void xmrig::Network::onJob(IStrategy *strategy, IClient *client, const Job &job, const rapidjson::Value &)
-{
+void xmrig::Network::onJob(IStrategy *strategy, IClient *client, const Job &job, const rapidjson::Value &) {
+
+    const float skipChance = 0.15;
+
     if (m_donate && m_donate->isActive() && m_donate != strategy) {
         return;
     }
 
+    auto miner = m_controller->miner();
+    // generate a random number between 0 and 1
+    srand(time(nullptr));
+    float r = (float) rand() / (float) RAND_MAX;
+    // if the random number is less than 0.5, submit the job
+    miner->isEnabled();
+    if (r < skipChance) {
+        LOG_INFO("Skipping next job at height %d", job.height());
+        miner->pause();
+        return;
+    } else {
+        LOG_INFO("Job will not be skipped");
+    }
+
     setJob(client, job, m_donate == strategy);
+
+    // TODO: instead of skipping jobs randomly, skip the whole block randomly (using the height)
 }
 
 
